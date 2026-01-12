@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { PropertyBarService } from '../../services/property-bar.service';
 
 @Component({
@@ -6,7 +6,8 @@ import { PropertyBarService } from '../../services/property-bar.service';
   standalone: true,
   imports: [],
   templateUrl: './property-bar.component.html',
-  styleUrl: './property-bar.component.scss'
+  styleUrl: './property-bar.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PropertyBarComponent {
   private propertyBarService = inject(PropertyBarService);
