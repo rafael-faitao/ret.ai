@@ -23,6 +23,10 @@ export class MockService {
     for (let i = 0; i < count; i++) {
       const shelf = new ProductShelf();
       shelf.name = `Shelf ${i + 1}`;
+      shelf.x = 100 + (i % 3) * 150;
+      shelf.y = 100 + Math.floor(i / 3) * 120;
+      shelf.width = 100;
+      shelf.height = 50;
       shelf.orientation = (i % 2) * 90; // Alternate between 0 and 90 degrees
       shelf.color = colors[i % colors.length];
       shelves.push(shelf);

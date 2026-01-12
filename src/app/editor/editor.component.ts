@@ -21,9 +21,15 @@ export class EditorComponent implements AfterViewInit {
   private gridSize: number = 20;
   private configService = inject(ConfigService);
   private mockService = inject(MockService);
+  private activeRetailLayout: RetailLayout | null = null;
+  private shelfShapeMap: Map<Konva.Rect, ProductShelf> = new Map();
 
   ngAfterViewInit(): void {
     this.initKonva();
+  }
+
+  getActiveLayout(): RetailLayout | null {
+    return this.activeRetailLayout;
   }
 
   private initKonva(): void {
@@ -104,23 +110,50 @@ export class EditorComponent implements AfterViewInit {
       draggable: true,
     });
 
+    // Track the shape-model relationship
+    this.shelfShapeMap.set(rect, shelf);
+
+    // Add drag event listeners to sync state
+    rect.on('dragmove', () => this.onShelfDrag(rect));
+    rect.on('dragend', () => this.onShelfDragEnd(rect));
+
     this.layer.add(rect);
     this.layer.draw();
+  }
+
+  private onShelfDrag(shape: Konva.Rect): void {
+    const shelf = this.shelfShapeMap.get(shape);
+    if (shelf) {
+      shelf.x = shape.x();
+      shelf.y = shape.y();
+    }
+  }
+
+  private onShelfDragEnd(shape: Konva.Rect): void {
+    const shelf = this.shelfShapeMap.get(shape);
+    if (shelf) {
+      shelf.x = shape.x();
+      shelf.y = shape.y();
+      console.log(`${shelf.name} moved to (${shelf.x.toFixed(2)}, ${shelf.y.toFixed(2)})`);
+    }
   }
 
   private debugTest(): void {
     // Inject mock layout for testing
     const mockLayout = this.mockService.generateRetailLayout();
     this.loadLayout(mockLayout);
+    console.log('Loaded mock layout:', mockLayout);
     
   }
 
   private loadLayout(storeLayout: RetailLayout) {
+    this.activeRetailLayout = storeLayout;
+    this.shelfShapeMap.clear();
+    
     this.drawStoreOutline(storeLayout.outline);
     storeLayout.shelves.forEach(shelf => {
       this.drawProductShelf(shelf);
     });
-    
   }
 
   private drawStoreOutline(outline: { x: number; y: number }[]) {
