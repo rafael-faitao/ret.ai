@@ -2,6 +2,8 @@ import { Component, ElementRef, ViewChild, AfterViewInit, inject } from '@angula
 import Konva from 'konva';
 import { ConfigService } from '../services/config.service';
 import { ProductShelf } from '../domain/models/product-shelf.model';
+import { RetailLayout } from '../domain/models/retail-layout.model';
+import { MockService } from '../services/mock.service';
 
 @Component({
   selector: 'app-editor',
@@ -18,6 +20,7 @@ export class EditorComponent implements AfterViewInit {
 
   private gridSize: number = 20;
   private configService = inject(ConfigService);
+  private mockService = inject(MockService);
 
   ngAfterViewInit(): void {
     this.initKonva();
@@ -106,9 +109,34 @@ export class EditorComponent implements AfterViewInit {
   }
 
   private debugTest(): void {
-    const testShelf = new ProductShelf();
-    testShelf.x = 150;
-    testShelf.y = 150;
-    this.drawProductShelf(testShelf);
+    // Inject mock layout for testing
+    const mockLayout = this.mockService.generateRetailLayout();
+    this.loadLayout(mockLayout);
+    
+  }
+
+  private loadLayout(storeLayout: RetailLayout) {
+    this.drawStoreOutline(storeLayout.outline);
+    storeLayout.shelves.forEach(shelf => {
+      this.drawProductShelf(shelf);
+    });
+    
+  }
+
+  private drawStoreOutline(outline: { x: number; y: number }[]) {
+    const points: number[] = [];
+    outline.forEach(point => {
+      points.push(point.x, point.y);
+    });
+
+    const line = new Konva.Line({
+      points: points,
+      stroke: 'black',
+      strokeWidth: 2,
+      closed: true,
+    });
+
+    this.layer.add(line);
+    this.layer.draw();
   }
 }
