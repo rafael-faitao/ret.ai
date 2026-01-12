@@ -1,9 +1,10 @@
-import { Component, ElementRef, ViewChild, AfterViewInit, inject } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, inject, effect } from '@angular/core';
 import Konva from 'konva';
-import { ConfigService } from '../services/config.service';
-import { ProductShelf } from '../domain/models/product-shelf.model';
-import { RetailLayout } from '../domain/models/retail-layout.model';
-import { MockService } from '../services/mock.service';
+import { ConfigService } from '../../services/config.service';
+import { ProductShelf } from '../../domain/models/product-shelf.model';
+import { RetailLayout } from '../../domain/models/retail-layout.model';
+import { MockService } from '../../services/mock.service';
+import { PropertyBarService } from '../../services/property-bar.service';
 
 @Component({
   selector: 'app-editor',
@@ -21,8 +22,20 @@ export class EditorComponent implements AfterViewInit {
   private gridSize: number = 20;
   private configService = inject(ConfigService);
   private mockService = inject(MockService);
+  private propertyBarService = inject(PropertyBarService);
   private activeRetailLayout: RetailLayout | null = null;
   private shelfShapeMap: Map<Konva.Group, ProductShelf> = new Map();
+
+  constructor() {
+    // Effect to sync property bar changes to Konva shapes
+    effect(() => {
+      const selectedShelf = this.propertyBarService.selectedShelf();
+      console.dir('eff', selectedShelf);
+      if (selectedShelf) {
+        this.updateShelfVisual(selectedShelf);
+      }
+    });
+  }
 
   ngAfterViewInit(): void {
     this.initKonva();
@@ -140,6 +153,9 @@ export class EditorComponent implements AfterViewInit {
     // Track the group-model relationship
     this.shelfShapeMap.set(shelfGroup, shelf);
 
+    // Add click event for selection
+    shelfGroup.on('click', () => this.onShelfSelect(shelf));
+
     // Add drag event listeners
     shelfGroup.on('dragmove', () => this.onShelfDrag(shelfGroup));
     shelfGroup.on('dragend', () => this.onShelfDragEnd(shelfGroup));
@@ -153,6 +169,38 @@ export class EditorComponent implements AfterViewInit {
     if (shelf) {
       shelf.x = shape.x();
       shelf.y = shape.y();
+    }
+  }
+
+  private onShelfSelect(shelf: ProductShelf): void {
+    this.propertyBarService.selectShelf(shelf);
+    console.log('Selected shelf:', shelf.name);
+  }
+
+  private updateShelfVisual(shelf: ProductShelf): void {
+    // Find the corresponding Konva group by shelf ID
+    for (const [group, shelfModel] of this.shelfShapeMap.entries()) {
+      if (shelfModel.id === shelf.id) {
+        // Update group position and rotation
+        group.x(shelf.x);
+        group.y(shelf.y);
+        group.rotation(shelf.orientation);
+
+        // Update rectangle color
+        const rect = group.findOne('Rect') as Konva.Rect;
+        if (rect) {
+          rect.fill(shelf.color);
+        }
+
+        // Update text
+        const text = group.findOne('Text') as Konva.Text;
+        if (text) {
+          text.text(shelf.name);
+        }
+
+        this.layer.batchDraw();
+        break;
+      }
     }
   }
 

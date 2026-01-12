@@ -1,0 +1,68 @@
+<aside class="main-panel">
+  <h2 class="panel-header">Shelf Details</h2>
+  
+  @if (shelf(); as selectedShelf) {
+    <div class="property-section">
+      <label class="property-label">Name</label>
+      <input 
+        type="text" 
+        class="text-input" 
+        [value]="selectedShelf.name"
+        (input)="onNameChange($event)"
+      />
+    </div>
+
+    <div class="property-section">
+      <label class="property-label">Color</label>
+      <div class="color-input-wrapper">
+        <span class="color-preview" [style.background-color]="selectedShelf.color"></span>
+        <input 
+          type="text" 
+          class="text-input" 
+          [value]="selectedShelf.color"
+          (input)="onColorChange($event)"
+        />
+      </div>
+    </div>
+
+    <div class="property-section">
+      <label class="property-label">Orientation</label>
+      <div class="btn-group">
+        <button 
+          class="btn" 
+          [class.selected]="selectedShelf.orientation === 0"
+          (click)="onOrientationChange(0)"
+        >
+          0°
+        </button>
+        <button 
+          class="btn" 
+          [class.selected]="selectedShelf.orientation === 90"
+          (click)="onOrientationChange(90)"
+        >
+          90°
+        </button>
+        <button 
+          class="btn" 
+          [class.selected]="selectedShelf.orientation === 180"
+          (click)="onOrientationChange(180)"
+        >
+          180°
+        </button>
+        <button 
+          class="btn" 
+          [class.selected]="selectedShelf.orientation === 270"
+          (click)="onOrientationChange(270)"
+        >
+          270°
+        </button>
+      </div>
+    </div>
+
+    <div class="property-section">
+      <button class="btn btn-delete" (click)="onDelete()">
+        <span>🗑️</span> Delete
+      </button>
+    </div>
+  }
+</aside>

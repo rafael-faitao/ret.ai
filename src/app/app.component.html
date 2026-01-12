@@ -1,8 +1,12 @@
 <header>
-  <h1>Ret.ai</h1>
+    <h1>Ret.ai</h1>
 </header>
 <main>
-  <div class="editor-wrapper">
-    <app-editor></app-editor>
-  </div>
+    @if (hasSelection || true) {
+    <app-property-bar></app-property-bar>
+    }
+    <div class="editor-wrapper">
+        <app-editor></app-editor>
+    </div>
+
 </main>

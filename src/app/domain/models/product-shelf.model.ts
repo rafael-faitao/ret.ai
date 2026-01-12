@@ -1,4 +1,5 @@
 export class ProductShelf {
+    id: string = crypto.randomUUID();
     name: string = '';
     orientation: number = 0; // degrees
     color: string = '#597DA9';
