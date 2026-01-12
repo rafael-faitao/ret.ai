@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { EditorComponent } from '../editor/editor.component';
+import { EditorComponent } from './editor/editor.component';
 
 @Component({
   selector: 'app-root',
