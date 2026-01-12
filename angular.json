@@ -49,6 +49,7 @@
               }
             ],
             "styles": [
+              "src/base.scss",
               "src/styles.css"
             ]
           },
