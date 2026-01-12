@@ -1,9 +1,10 @@
-import { Component, ElementRef, ViewChild, AfterViewInit, inject } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, inject, OnDestroy } from '@angular/core';
 import Konva from 'konva';
 import { ConfigService } from '../services/config.service';
 import { ProductShelf } from '../domain/models/product-shelf.model';
 import { RetailLayout } from '../domain/models/retail-layout.model';
 import { MockService } from '../services/mock.service';
+import { fromEvent, Subject, debounceTime, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-editor',
@@ -12,7 +13,7 @@ import { MockService } from '../services/mock.service';
   templateUrl: './editor.component.html',
   styleUrl: './editor.component.scss'
 })
-export class EditorComponent implements AfterViewInit {
+export class EditorComponent implements AfterViewInit, OnDestroy {
   @ViewChild('konvaContainer', { static: false }) konvaContainer!: ElementRef;
   private stage!: Konva.Stage;
   private layer!: Konva.Layer;
@@ -22,10 +23,16 @@ export class EditorComponent implements AfterViewInit {
   private configService = inject(ConfigService);
   private mockService = inject(MockService);
   private activeRetailLayout: RetailLayout | null = null;
-  private shelfShapeMap: Map<Konva.Rect, ProductShelf> = new Map();
+  private shelfShapeMap: Map<Konva.Group, ProductShelf> = new Map();
+  private destroy$ = new Subject<void>();
 
   ngAfterViewInit(): void {
     this.initKonva();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   getActiveLayout(): RetailLayout | null {
@@ -98,30 +105,65 @@ export class EditorComponent implements AfterViewInit {
   }
 
   private drawProductShelf(shelf: ProductShelf): void {
+    // Create shelf rectangle
     const rect = new Konva.Rect({
-      x: shelf.x,
-      y: shelf.y,
+      x: 0,
+      y: 0,
       width: shelf.width,
       height: shelf.height,
       fill: shelf.color,
-      rotation: shelf.orientation,
       offsetX: shelf.width / 2,
       offsetY: shelf.height / 2,
+    });
+
+    // Create group to hold rect and text together
+    const shelfGroup = new Konva.Group({
+      x: shelf.x,
+      y: shelf.y,
+      rotation: shelf.orientation,
       draggable: true,
     });
 
-    // Track the shape-model relationship
-    this.shelfShapeMap.set(rect, shelf);
+    // Add rectangle to group
+    shelfGroup.add(rect);
 
-    // Add drag event listeners to sync state
-    rect.on('dragmove', () => this.onShelfDrag(rect));
-    rect.on('dragend', () => this.onShelfDragEnd(rect));
+    // Add shelf name text
+    const text = new Konva.Text({
+      x: -shelf.width / 2,
+      y: -shelf.height / 2,
+      width: shelf.width,
+      height: shelf.height,
+      text: shelf.name,
+      fontSize: 12,
+      fontFamily: 'Arial',
+      fill: '#ffffff',
+      align: 'center',
+      verticalAlign: 'middle',
+      padding: 5,
+    });
 
-    this.layer.add(rect);
+    shelfGroup.add(text);
+
+    // Track the group-model relationship
+    this.shelfShapeMap.set(shelfGroup, shelf);
+
+    // Use RxJS for drag event handling
+    fromEvent(shelfGroup, 'dragmove')
+      .pipe(
+        debounceTime(10),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => this.onShelfDrag(shelfGroup));
+
+    fromEvent(shelfGroup, 'dragend')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.onShelfDragEnd(shelfGroup));
+
+    this.layer.add(shelfGroup);
     this.layer.draw();
   }
 
-  private onShelfDrag(shape: Konva.Rect): void {
+  private onShelfDrag(shape: Konva.Group): void {
     const shelf = this.shelfShapeMap.get(shape);
     if (shelf) {
       shelf.x = shape.x();
@@ -129,7 +171,7 @@ export class EditorComponent implements AfterViewInit {
     }
   }
 
-  private onShelfDragEnd(shape: Konva.Rect): void {
+  private onShelfDragEnd(shape: Konva.Group): void {
     const shelf = this.shelfShapeMap.get(shape);
     if (shelf) {
       shelf.x = shape.x();
