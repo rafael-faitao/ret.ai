@@ -1,10 +1,9 @@
-import { Component, ElementRef, ViewChild, AfterViewInit, inject, OnDestroy } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, inject } from '@angular/core';
 import Konva from 'konva';
 import { ConfigService } from '../services/config.service';
 import { ProductShelf } from '../domain/models/product-shelf.model';
 import { RetailLayout } from '../domain/models/retail-layout.model';
 import { MockService } from '../services/mock.service';
-import { fromEvent, Subject, debounceTime, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-editor',
@@ -13,7 +12,7 @@ import { fromEvent, Subject, debounceTime, takeUntil } from 'rxjs';
   templateUrl: './editor.component.html',
   styleUrl: './editor.component.scss'
 })
-export class EditorComponent implements AfterViewInit, OnDestroy {
+export class EditorComponent implements AfterViewInit {
   @ViewChild('konvaContainer', { static: false }) konvaContainer!: ElementRef;
   private stage!: Konva.Stage;
   private layer!: Konva.Layer;
@@ -24,15 +23,9 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   private mockService = inject(MockService);
   private activeRetailLayout: RetailLayout | null = null;
   private shelfShapeMap: Map<Konva.Group, ProductShelf> = new Map();
-  private destroy$ = new Subject<void>();
 
   ngAfterViewInit(): void {
     this.initKonva();
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   getActiveLayout(): RetailLayout | null {
@@ -147,17 +140,9 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     // Track the group-model relationship
     this.shelfShapeMap.set(shelfGroup, shelf);
 
-    // Use RxJS for drag event handling
-    fromEvent(shelfGroup, 'dragmove')
-      .pipe(
-        debounceTime(10),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(() => this.onShelfDrag(shelfGroup));
-
-    fromEvent(shelfGroup, 'dragend')
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.onShelfDragEnd(shelfGroup));
+    // Add drag event listeners
+    shelfGroup.on('dragmove', () => this.onShelfDrag(shelfGroup));
+    shelfGroup.on('dragend', () => this.onShelfDragEnd(shelfGroup));
 
     this.layer.add(shelfGroup);
     this.layer.draw();
