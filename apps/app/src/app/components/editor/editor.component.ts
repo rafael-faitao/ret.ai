@@ -250,7 +250,10 @@ export class EditorComponent implements AfterViewInit {
     // Clear the layer by removing all children
     this.layer.destroyChildren();
     
-    this.drawStoreOutline(storeLayout.outline);
+
+    if (storeLayout.outline) {
+        this.drawStoreOutline(storeLayout.outline);
+    }
     storeLayout.shelves.forEach(shelf => {
       this.drawProductShelf(shelf);
     });
