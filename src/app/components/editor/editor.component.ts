@@ -243,11 +243,14 @@ export class EditorComponent implements AfterViewInit {
     
   }
 
-  private loadLayout(storeLayout: RetailLayout) {
+  public loadLayout(storeLayout: RetailLayout) {
     this.activeRetailLayout = storeLayout;
     this.shelfShapeMap.clear();
     this.structureObjectShapeMap.clear();
     this.propertyBarService.setActiveLayout(storeLayout);
+    
+    // Clear the layer by removing all children
+    this.layer.destroyChildren();
     
     this.drawStoreOutline(storeLayout.outline);
     storeLayout.shelves.forEach(shelf => {

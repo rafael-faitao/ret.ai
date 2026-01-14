@@ -1,0 +1,43 @@
+<div class="dialog-overlay" [class.open]="isOpen()">
+  <div class="dialog-box">
+    <h2>Generate Layout</h2>
+
+    @if (isGenerating()) {
+      <div class="loader">
+        <div class="spinner"></div>
+        <p>Generating layout...</p>
+      </div>
+    } @else if (!importMode()) {
+      <div class="mode-selection">
+        <button class="btn" (click)="selectMode('text')">From Text Description</button>
+        <button class="btn" (click)="selectMode('image')">From Image</button>
+      </div>
+    } @else if (importMode() === 'text') {
+      <div class="text-input-section">
+        <label>Describe your store layout:</label>
+        <textarea 
+          [(ngModel)]="textDescription"
+          placeholder="e.g., Electronics in the front left, grocery in the back right, clothing in the middle..."
+        ></textarea>
+        <div class="button-group">
+          <button class="btn btn-primary" (click)="generateFromText()" [disabled]="!textDescription().trim()">
+            Generate
+          </button>
+          <button class="btn btn-secondary" (click)="selectMode(null)">Back</button>
+        </div>
+      </div>
+    } @else if (importMode() === 'image') {
+      <div class="image-input-section">
+        <label>Upload a store layout image:</label>
+        <input
+          type="file"
+          accept="image/*"
+          (change)="handleImageSelect($event)"
+        />
+        <button class="btn btn-secondary" (click)="selectMode(null)">Back</button>
+      </div>
+    }
+
+    <button class="close-btn" (click)="closeDialog()" aria-label="Close dialog">×</button>
+  </div>
+</div>

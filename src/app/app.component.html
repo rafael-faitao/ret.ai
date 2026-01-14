@@ -1,5 +1,16 @@
 <header>
-    <h1>Ret.ai</h1>
+    <div class="header-content">
+        <h1>Ret.ai</h1>
+        <div class="menu-button-container">
+            <button class="menu-btn" (click)="toggleMenu()" #menuBtn>☰</button>
+            @if (showMenu()) {
+            <div class="dropdown-menu">
+                <button (click)="newLayout()" class="dropdown-item">New Layout</button>
+                <button (click)="openGenerateDialog()" class="dropdown-item">Generate Layout from Image</button>
+            </div>
+            }
+        </div>
+    </div>
 </header>
 <main>
     @if (hasSelection || true) {
@@ -7,7 +18,8 @@
     }
     <app-analytics-bar></app-analytics-bar>
     <div class="editor-wrapper">
-        <app-editor></app-editor>
+        <app-editor #editor></app-editor>
     </div>
-
 </main>
+
+<app-layout-import-dialog #importDialog (onLayoutGenerated)="onLayoutGenerated($event)"></app-layout-import-dialog>
