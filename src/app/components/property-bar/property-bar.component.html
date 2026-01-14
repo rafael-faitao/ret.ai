@@ -1,7 +1,7 @@
 <aside class="main-panel">
-  <h2 class="panel-header">Properties</h2>
-  
   @if (shelf(); as selectedShelf) {
+    <h2 class="panel-header">Shelf Details</h2>
+    
     <div class="property-section">
       <label class="property-label">Name</label>
       <input 
@@ -64,5 +64,75 @@
         <span>🗑️</span> Delete
       </button>
     </div>
+  } @else if (structureObject(); as selectedObject) {
+    <h2 class="panel-header">Structure Object</h2>
+    
+    <div class="property-section">
+      <label class="property-label">Name</label>
+      <input 
+        type="text" 
+        class="text-input" 
+        [value]="selectedObject.name"
+        (input)="onStructureObjectNameChange($event)"
+      />
+    </div>
+
+    <div class="property-section">
+      <label class="property-label">Type</label>
+      <select 
+        class="text-input" 
+        [value]="selectedObject.type"
+        (change)="onStructureObjectTypeChange($event)"
+      >
+        <option [value]="StructureObjectType.ENTRANCE">Entrance</option>
+        <option [value]="StructureObjectType.EXIT">Exit</option>
+        <option [value]="StructureObjectType.CASH_COUNTER">Cash Counter</option>
+        <option [value]="StructureObjectType.ENTRANCE_EXIT">Entrance/Exit</option>
+        <option [value]="StructureObjectType.STRUCTURAL_BLOCKER">Structural Blocker</option>
+      </select>
+    </div>
+
+    <div class="property-section">
+      <label class="property-label">Orientation</label>
+      <div class="btn-group">
+        <button 
+          class="btn" 
+          [class.selected]="selectedObject.orientation === 0"
+          (click)="onStructureObjectOrientationChange(0)"
+        >
+          0°
+        </button>
+        <button 
+          class="btn" 
+          [class.selected]="selectedObject.orientation === 90"
+          (click)="onStructureObjectOrientationChange(90)"
+        >
+          90°
+        </button>
+        <button 
+          class="btn" 
+          [class.selected]="selectedObject.orientation === 180"
+          (click)="onStructureObjectOrientationChange(180)"
+        >
+          180°
+        </button>
+        <button 
+          class="btn" 
+          [class.selected]="selectedObject.orientation === 270"
+          (click)="onStructureObjectOrientationChange(270)"
+        >
+          270°
+        </button>
+      </div>
+    </div>
+
+    <div class="property-section">
+      <button class="btn btn-delete" (click)="onStructureObjectDelete()">
+        <span>🗑️</span> Delete
+      </button>
+    </div>
+  } @else {
+    <h2 class="panel-header">Properties</h2>
+    <p class="no-selection">Select a shelf or structure object to edit properties</p>
   }
 </aside>

@@ -37,6 +37,13 @@ export class EditorComponent implements AfterViewInit {
         this.updateShelfVisual(selectedShelf);
       }
     });
+
+    effect(() => {
+      const selectedStructureObject = this.propertyBarService.selectedStructureObject();
+      if (selectedStructureObject) {
+        this.updateStructureObjectVisual(selectedStructureObject);
+      }
+    });
   }
 
   ngAfterViewInit(): void {
@@ -309,6 +316,7 @@ export class EditorComponent implements AfterViewInit {
   }
 
   private onStructureObjectSelect(structureObject: StructureObject): void {
+    this.propertyBarService.selectStructureObject(structureObject);
     console.log('Selected structure object:', structureObject.name, structureObject.type);
   }
 
@@ -328,6 +336,39 @@ export class EditorComponent implements AfterViewInit {
       console.log(`${structureObject.name} moved to (${structureObject.x.toFixed(2)}, ${structureObject.y.toFixed(2)})`);
     }
   }
+private updateStructureObjectVisual(structureObject: StructureObject): void {
+    // Find the corresponding Konva group by structure object ID
+    for (const [group, objectModel] of this.structureObjectShapeMap.entries()) {
+      if (objectModel.id === structureObject.id) {
+        // Update group position and rotation
+        group.x(structureObject.x);
+        group.y(structureObject.y);
+        group.rotation(structureObject.orientation);
 
+        // Update text
+        const text = group.findOne('Text') as Konva.Text;
+        if (text) {
+          text.text(structureObject.name);
+        }
+
+        // Update icon if type changed
+        const existingImage = group.findOne('Image') as Konva.Image;
+        if (existingImage) {
+          const iconPath = `/assets/ui/${structureObject.type}.svg`;
+          const image = new Image();
+          image.src = iconPath;
+          image.onload = () => {
+            existingImage.image(image);
+            this.layer.batchDraw();
+          };
+        }
+
+        this.layer.batchDraw();
+        break;
+      }
+    }
+  }
+
+  
   
 }
