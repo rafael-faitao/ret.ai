@@ -1,3 +1,13 @@
+.main-panel {
+  position: fixed;
+  left: 0.5rem;
+  top: 4.5rem;
+  width: 290px;
+  height: calc(100vh - 4rem - 1rem);
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
 .property-section {
   margin-bottom: 1.5rem;
 
