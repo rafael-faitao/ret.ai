@@ -142,6 +142,18 @@ export class EditorComponent implements AfterViewInit {
     // Add rectangle to group
     shelfGroup.add(rect);
 
+    // Add facing indicator (semi-transparent rectangle at the front)
+    const indicatorHeight = 6;
+    const facingIndicator = new Konva.Rect({
+      x: -shelf.width / 2,
+      y: shelf.height / 2,
+      width: shelf.width,
+      height: indicatorHeight,
+      fill: shelf.color,
+      opacity: 0.3,
+    });
+    shelfGroup.add(facingIndicator);
+
     // Add shelf name text
     const text = new Konva.Text({
       x: -shelf.width / 2,
@@ -166,6 +178,7 @@ export class EditorComponent implements AfterViewInit {
     shelfGroup.on('click', () => this.onShelfSelect(shelf));
 
     // Add drag event listeners
+    shelfGroup.on('dragstart', () => this.onShelfSelect(shelf));
     shelfGroup.on('dragmove', () => this.onShelfDrag(shelfGroup));
     shelfGroup.on('dragend', () => this.onShelfDragEnd(shelfGroup));
 
@@ -308,6 +321,7 @@ export class EditorComponent implements AfterViewInit {
     group.on('click', () => this.onStructureObjectSelect(structureObject));
 
     // Add drag event listeners
+    group.on('dragstart', () => this.onStructureObjectSelect(structureObject));
     group.on('dragmove', () => this.onStructureObjectDrag(group));
     group.on('dragend', () => this.onStructureObjectDragEnd(group));
 
