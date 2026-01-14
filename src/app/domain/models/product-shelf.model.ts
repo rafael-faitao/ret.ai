@@ -7,4 +7,5 @@ export class ProductShelf {
     height: number = 30; // meters
     x: number = 0;
     y: number = 0;
+    averageTicket: number = 0;
 }

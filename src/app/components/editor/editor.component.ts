@@ -2,6 +2,7 @@ import { Component, ElementRef, ViewChild, AfterViewInit, inject, effect } from 
 import Konva from 'konva';
 import { ConfigService } from '../../services/config.service';
 import { ProductShelf } from '../../domain/models/product-shelf.model';
+import { StructureObject } from '../../domain/models/structure-object.model';
 import { RetailLayout } from '../../domain/models/retail-layout.model';
 import { MockService } from '../../services/mock.service';
 import { PropertyBarService } from '../../services/property-bar.service';
@@ -25,6 +26,7 @@ export class EditorComponent implements AfterViewInit {
   private propertyBarService = inject(PropertyBarService);
   private activeRetailLayout: RetailLayout | null = null;
   private shelfShapeMap: Map<Konva.Group, ProductShelf> = new Map();
+  private structureObjectShapeMap: Map<Konva.Group, StructureObject> = new Map();
 
   constructor() {
     // Effect to sync property bar changes to Konva shapes
@@ -224,10 +226,15 @@ export class EditorComponent implements AfterViewInit {
   private loadLayout(storeLayout: RetailLayout) {
     this.activeRetailLayout = storeLayout;
     this.shelfShapeMap.clear();
+    this.structureObjectShapeMap.clear();
     
     this.drawStoreOutline(storeLayout.outline);
     storeLayout.shelves.forEach(shelf => {
       this.drawProductShelf(shelf);
+    });
+
+    storeLayout.structureObjects.forEach(structureObject => {
+      this.drawStructureObject(structureObject);
     });
   }
 
@@ -247,4 +254,80 @@ export class EditorComponent implements AfterViewInit {
     this.layer.add(line);
     this.layer.draw();
   }
+
+  private drawStructureObject(structureObject: StructureObject): void {
+    // Create a group for the structure object
+    const group = new Konva.Group({
+      x: structureObject.x,
+      y: structureObject.y,
+      rotation: structureObject.orientation,
+      draggable: true,
+    });
+
+    // Create and add the icon image
+    const iconPath = `/assets/ui/${structureObject.type}.svg`;
+    const image = new Image();
+    image.src = iconPath;
+    image.onload = () => {
+      const konvaImage = new Konva.Image({
+        image: image,
+        x: -structureObject.width / 2,
+        y: -structureObject.height / 2,
+        width: structureObject.width,
+        height: structureObject.height,
+      });
+      group.add(konvaImage);
+      this.layer.draw();
+    };
+
+    // Add label text below the icon
+    const text = new Konva.Text({
+      x: -structureObject.width / 2,
+      y: structureObject.height / 2 + 5,
+      width: structureObject.width,
+      text: structureObject.name,
+      fontSize: 10,
+      fontFamily: 'Arial',
+      fill: '#333333',
+      align: 'center',
+    });
+
+    group.add(text);
+
+    // Track the group-model relationship
+    this.structureObjectShapeMap.set(group, structureObject);
+
+    // Add click event for selection
+    group.on('click', () => this.onStructureObjectSelect(structureObject));
+
+    // Add drag event listeners
+    group.on('dragmove', () => this.onStructureObjectDrag(group));
+    group.on('dragend', () => this.onStructureObjectDragEnd(group));
+
+    this.layer.add(group);
+    this.layer.draw();
+  }
+
+  private onStructureObjectSelect(structureObject: StructureObject): void {
+    console.log('Selected structure object:', structureObject.name, structureObject.type);
+  }
+
+  private onStructureObjectDrag(shape: Konva.Group): void {
+    const structureObject = this.structureObjectShapeMap.get(shape);
+    if (structureObject) {
+      structureObject.x = shape.x();
+      structureObject.y = shape.y();
+    }
+  }
+
+  private onStructureObjectDragEnd(shape: Konva.Group): void {
+    const structureObject = this.structureObjectShapeMap.get(shape);
+    if (structureObject) {
+      structureObject.x = shape.x();
+      structureObject.y = shape.y();
+      console.log(`${structureObject.name} moved to (${structureObject.x.toFixed(2)}, ${structureObject.y.toFixed(2)})`);
+    }
+  }
+
+  
 }
