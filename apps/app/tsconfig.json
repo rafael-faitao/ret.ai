@@ -1,3 +1,5 @@
+/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
+/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
   "compileOnSave": false,
   "compilerOptions": {
@@ -15,7 +17,7 @@
     "module": "preserve",
     "paths": {
       "models": [
-        "libs/shared/models/src/index.ts"
+        "../../libs/shared/models/src/index.ts"
       ]
     }
   },
