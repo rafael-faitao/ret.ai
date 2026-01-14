@@ -43,3 +43,13 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 0.5rem;
 }
+
+.badge {
+  display: inline-block;
+  padding: 0.5rem 0.75rem;
+  background: #f0f0f0;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}

@@ -13,6 +13,11 @@
     </div>
 
     <div class="property-section">
+      <label class="property-label">Average Ticket</label>
+      <div class="badge">${{ selectedShelf.averageTicket.toFixed(2) }}</div>
+    </div>
+
+    <div class="property-section">
       <label class="property-label">Color</label>
       <div class="color-input-wrapper">
         <span class="color-preview" [style.background-color]="selectedShelf.color"></span>

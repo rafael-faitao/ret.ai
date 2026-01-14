@@ -20,17 +20,30 @@ export class MockService {
 
   generateShelves(count: number = 5): ProductShelf[] {
     const shelves: ProductShelf[] = [];
-    const colors = ['#597DA9', '#E85D75', '#59A96D', '#E8A75D', '#9D59A9'];
+    
+    // Define department store sections with colors and average ticket values
+    const sections = [
+      { name: 'Electronics', color: '#597DA9', averageTicket: 450.00 },
+      { name: 'Clothing', color: '#E85D75', averageTicket: 120.00 },
+      { name: 'Home & Garden', color: '#59A96D', averageTicket: 85.00 },
+      { name: 'Beauty & Care', color: '#E8A75D', averageTicket: 65.00 },
+      { name: 'Toys', color: '#9D59A9', averageTicket: 55.00 },
+      { name: 'Sports & Outdoors', color: '#5DADE8', averageTicket: 95.00 },
+      { name: 'Beverages', color: '#A9597D', averageTicket: 25.00 },
+      { name: 'Snacks', color: '#7DA959', averageTicket: 18.00 },
+    ];
     
     for (let i = 0; i < count; i++) {
       const shelf = new ProductShelf();
-      shelf.name = `Shelf ${i + 1}`;
+      const section = sections[i % sections.length];
+      shelf.name = section.name;
       shelf.x = 100 + (i % 3) * 150;
       shelf.y = 100 + Math.floor(i / 3) * 120;
       shelf.width = 100;
       shelf.height = 50;
       shelf.orientation = (i % 2) * 90; // Alternate between 0 and 90 degrees
-      shelf.color = colors[i % colors.length];
+      shelf.color = section.color;
+      shelf.averageTicket = section.averageTicket;
       shelves.push(shelf);
     }
     
