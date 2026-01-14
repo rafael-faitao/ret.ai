@@ -15,6 +15,7 @@ export class MockService {
     layout.structureObjects = this.generateStructureObjects();
     layout.outline = this.generateStoreOutline();
     layout.backgroundColor = '#ffffff';
+    layout.overallScore = 82; // Mocked global score
     return layout;
   }
 

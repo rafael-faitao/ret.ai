@@ -1,0 +1,41 @@
+<aside class="analytics-panel">
+  <!-- Global overall score (always visible) -->
+  <div class="overall">
+    <div class="metric-title">
+      <span>Overall Score</span>
+      <span class="info" title="Global layout performance score (mock)">i</span>
+    </div>
+    <div class="metric-value">{{ (layoutSignal()?.overallScore) ?? '—' }}</div>
+  </div>
+
+  @if (shelfSignal(); as shelf) {
+    <!-- Scores section (no explicit title) -->
+    <div class="metrics">
+      @for (metric of metrics; track metric.key) {
+        <div class="metric-row">
+          <div class="metric-title">
+            <span>{{ metric.title }}</span>
+            <span class="info" title="{{ metric.info }}">i</span>
+          </div>
+          <div class="metric-value">{{ metric.value ?? '—' }}</div>
+        </div>
+      }
+    </div>
+
+    <!-- Suggestions section -->
+    <div class="suggestions">
+      <h3 class="section-title">Suggestions</h3>
+      @if (suggestions.length === 0) {
+        <button class="btn" (click)="analyzeNow()">Analyze now</button>
+      } @else {
+        <ul class="suggestion-list">
+          @for (item of suggestions; track item) {
+            <li>{{ item }}</li>
+          }
+        </ul>
+      }
+    </div>
+  } @else {
+    <p class="no-selection">Select a shelf to see analytics</p>
+  }
+</aside>

@@ -12,4 +12,5 @@ export class RetailLayout {
   structureObjects: StructureObject[] = [];
   outline: Point[] = []; // Array of points defining the store's outer boundary
   backgroundColor: string = '#ffffff';
+  overallScore: number = 0; // Global layout performance score
 }

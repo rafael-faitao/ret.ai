@@ -1,6 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { ProductShelf } from '../domain/models/product-shelf.model';
 import { StructureObject } from '../domain/models/structure-object.model';
+import { RetailLayout } from '../domain/models/retail-layout.model';
 
 @Injectable({
   providedIn: 'root'
@@ -8,10 +9,12 @@ import { StructureObject } from '../domain/models/structure-object.model';
 export class PropertyBarService {
   private selectedShelfSignal = signal<ProductShelf | null>(null);
   private selectedStructureObjectSignal = signal<StructureObject | null>(null);
+  private activeLayoutSignal = signal<RetailLayout | null>(null);
   
   // Read-only computed signals for components to consume
   selectedShelf = this.selectedShelfSignal.asReadonly();
   selectedStructureObject = this.selectedStructureObjectSignal.asReadonly();
+  activeLayout = this.activeLayoutSignal.asReadonly();
   
   // Computed signal to check if anything is selected
   hasSelection = computed(() => this.selectedShelfSignal() !== null || this.selectedStructureObjectSignal() !== null);
@@ -43,5 +46,9 @@ export class PropertyBarService {
   clearSelection(): void {
     this.selectedShelfSignal.set(null);
     this.selectedStructureObjectSignal.set(null);
+  }
+
+  setActiveLayout(layout: RetailLayout | null): void {
+    this.activeLayoutSignal.set(layout);
   }
 }

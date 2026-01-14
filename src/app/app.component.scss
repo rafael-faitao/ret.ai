@@ -45,3 +45,12 @@ app-property-bar {
   overflow-y: auto;
 }
 
+app-analytics-bar {
+  width: 290px;
+  position: fixed;
+  right: 0;
+  top: calc(4rem + 2rem);
+  height: calc(100vh - 4rem - 4rem);
+  overflow-y: auto;
+}
+
