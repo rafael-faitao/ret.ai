@@ -1,4 +1,5 @@
 import { Component, ElementRef, ViewChild, AfterViewInit, inject, effect } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import Konva from 'konva';
 import { ConfigService } from '../../services/config.service';
 import { ProductShelf, StructureObject, RetailLayout } from 'models';
@@ -8,7 +9,7 @@ import { PropertyBarService } from '../../services/property-bar.service';
 @Component({
   selector: 'app-editor',
   standalone: true,
-  imports: [],
+  imports: [FormsModule],
   templateUrl: './editor.component.html',
   styleUrl: './editor.component.scss'
 })
@@ -22,9 +23,12 @@ export class EditorComponent implements AfterViewInit {
   private configService = inject(ConfigService);
   private mockService = inject(MockService);
   private propertyBarService = inject(PropertyBarService);
-  private activeRetailLayout: RetailLayout | null = null;
+  activeRetailLayout: RetailLayout | null = null;
   private shelfShapeMap: Map<Konva.Group, ProductShelf> = new Map();
   private structureObjectShapeMap: Map<Konva.Group, StructureObject> = new Map();
+  
+  // Scaler properties
+  scaleValue: number = 1.0;
 
   constructor() {
     // Effect to sync property bar changes to Konva shapes
@@ -388,6 +392,47 @@ private updateStructureObjectVisual(structureObject: StructureObject): void {
     }
   }
 
-  
-  
+  /**
+   * Scale the entire layout by the specified factor
+   */
+  scaleLayout(): void {
+    if (!this.activeRetailLayout || this.scaleValue <= 0) {
+      console.warn('Cannot scale: invalid layout or scale value');
+      return;
+    }
+
+    const scale = this.scaleValue;
+
+    // Scale shelves
+    this.activeRetailLayout.shelves.forEach(shelf => {
+      shelf.x *= scale;
+      shelf.y *= scale;
+      shelf.width *= scale;
+      shelf.height *= scale;
+    });
+
+    // Scale structure objects
+    this.activeRetailLayout.structureObjects.forEach(obj => {
+      obj.x *= scale;
+      obj.y *= scale;
+      obj.width *= scale;
+      obj.height *= scale;
+    });
+
+    // Scale outline points
+    if (this.activeRetailLayout.outline && this.activeRetailLayout.outline.length > 0) {
+      this.activeRetailLayout.outline.forEach(point => {
+        point.x *= scale;
+        point.y *= scale;
+      });
+    }
+
+    // Reload the layout to redraw everything
+    this.loadLayout(this.activeRetailLayout);
+
+    console.log(`Layout scaled by factor: ${scale}`);
+    
+    // Reset scale value to 1.0 after applying
+    this.scaleValue = 1.0;
+  }
 }
