@@ -124,39 +124,30 @@ export class EditorComponent implements AfterViewInit {
   private drawProductShelf(shelf: ProductShelf): void {
     // Create shelf rectangle
     const rect = new Konva.Rect({
-      x: 0,
-      y: 0,
+      x: -shelf.width / 2,
+      y: -shelf.height / 2,
       width: shelf.width,
       height: shelf.height,
       fill: shelf.color,
-      offsetX: shelf.width / 2,
-      offsetY: shelf.height / 2,
+      name: 'shelfRect',
     });
 
-    // Create group to hold rect and text together
+    // Create group to hold rect and text together (no rotation on group)
     const shelfGroup = new Konva.Group({
       x: shelf.x,
       y: shelf.y,
-      rotation: shelf.orientation,
       draggable: true,
     });
 
     // Add rectangle to group
     shelfGroup.add(rect);
 
-    // Add facing indicator (semi-transparent rectangle at the front)
-    const indicatorHeight = 6;
-    const facingIndicator = new Konva.Rect({
-      x: -shelf.width / 2,
-      y: shelf.height / 2,
-      width: shelf.width,
-      height: indicatorHeight,
-      fill: shelf.color,
-      opacity: 0.3,
-    });
+    // Add facing indicator and arrow based on orientation
+    const { facingIndicator, arrow } = this.createOrientationIndicators(shelf);
     shelfGroup.add(facingIndicator);
+    shelfGroup.add(arrow);
 
-    // Add shelf name text
+    // Add shelf name text (always horizontal)
     const text = new Konva.Text({
       x: -shelf.width / 2,
       y: -shelf.height / 2,
@@ -169,6 +160,7 @@ export class EditorComponent implements AfterViewInit {
       align: 'center',
       verticalAlign: 'middle',
       padding: 5,
+      name: 'shelfText',
     });
 
     shelfGroup.add(text);
@@ -188,6 +180,83 @@ export class EditorComponent implements AfterViewInit {
     this.layer.draw();
   }
 
+  /**
+   * Creates the facing indicator and arrow based on shelf orientation.
+   * Orientation angles:
+   * - 0°: clients access from bottom (arrow points down)
+   * - 90°: clients access from right (arrow points right)
+   * - 180°: clients access from top (arrow points up)
+   * - 270°: clients access from left (arrow points left)
+   */
+  private createOrientationIndicators(shelf: ProductShelf): { facingIndicator: Konva.Rect; arrow: Konva.Arrow } {
+    const indicatorThickness = 6;
+    const orientation = shelf.orientation % 360;
+    const halfWidth = shelf.width / 2;
+    const halfHeight = shelf.height / 2;
+
+    let indicatorConfig: { x: number; y: number; width: number; height: number };
+    let arrowPoints: number[];
+
+    switch (orientation) {
+      case 90: // Right side access
+        indicatorConfig = {
+          x: halfWidth,
+          y: -halfHeight,
+          width: indicatorThickness,
+          height: shelf.height,
+        };
+        arrowPoints = [halfWidth - 15, 0, halfWidth + 5, 0];
+        break;
+      case 180: // Top side access
+        indicatorConfig = {
+          x: -halfWidth,
+          y: -halfHeight - indicatorThickness,
+          width: shelf.width,
+          height: indicatorThickness,
+        };
+        arrowPoints = [0, -halfHeight + 15, 0, -halfHeight - 5];
+        break;
+      case 270: // Left side access
+        indicatorConfig = {
+          x: -halfWidth - indicatorThickness,
+          y: -halfHeight,
+          width: indicatorThickness,
+          height: shelf.height,
+        };
+        arrowPoints = [-halfWidth + 15, 0, -halfWidth - 5, 0];
+        break;
+      case 0: // Bottom side access (default)
+      default:
+        indicatorConfig = {
+          x: -halfWidth,
+          y: halfHeight,
+          width: shelf.width,
+          height: indicatorThickness,
+        };
+        arrowPoints = [0, halfHeight - 15, 0, halfHeight + 5];
+        break;
+    }
+
+    const facingIndicator = new Konva.Rect({
+      ...indicatorConfig,
+      fill: shelf.color,
+      opacity: 0.3,
+      name: 'facingIndicator',
+    });
+
+    const arrow = new Konva.Arrow({
+      points: arrowPoints,
+      pointerLength: 8,
+      pointerWidth: 6,
+      fill: '#ffffff',
+      stroke: '#ffffff',
+      strokeWidth: 2,
+      name: 'orientationArrow',
+    });
+
+    return { facingIndicator, arrow };
+  }
+
   private onShelfDrag(shape: Konva.Group): void {
     const shelf = this.shelfShapeMap.get(shape);
     if (shelf) {
@@ -205,22 +274,31 @@ export class EditorComponent implements AfterViewInit {
     // Find the corresponding Konva group by shelf ID
     for (const [group, shelfModel] of this.shelfShapeMap.entries()) {
       if (shelfModel.id === shelf.id) {
-        // Update group position and rotation
+        // Update group position (no rotation on group)
         group.x(shelf.x);
         group.y(shelf.y);
-        group.rotation(shelf.orientation);
 
         // Update rectangle color
-        const rect = group.findOne('Rect') as Konva.Rect;
+        const rect = group.findOne('.shelfRect') as Konva.Rect;
         if (rect) {
           rect.fill(shelf.color);
         }
 
         // Update text
-        const text = group.findOne('Text') as Konva.Text;
+        const text = group.findOne('.shelfText') as Konva.Text;
         if (text) {
           text.text(shelf.name);
         }
+
+        // Remove old orientation indicators and create new ones
+        const oldIndicator = group.findOne('.facingIndicator');
+        const oldArrow = group.findOne('.orientationArrow');
+        if (oldIndicator) oldIndicator.destroy();
+        if (oldArrow) oldArrow.destroy();
+
+        const { facingIndicator, arrow } = this.createOrientationIndicators(shelf);
+        group.add(facingIndicator);
+        group.add(arrow);
 
         this.layer.batchDraw();
         break;
