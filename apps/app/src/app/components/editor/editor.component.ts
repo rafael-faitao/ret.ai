@@ -1,5 +1,6 @@
 import { Component, ElementRef, ViewChild, AfterViewInit, inject, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { SideBarSwitcherComponent } from '../side-bar-switcher/side-bar-switcher.component';
 import Konva from 'konva';
 import { ConfigService } from '../../services/config.service';
 import { ProductShelf, StructureObject, RetailLayout } from 'models';
@@ -9,7 +10,7 @@ import { PropertyBarService } from '../../services/property-bar.service';
 @Component({
   selector: 'app-editor',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, SideBarSwitcherComponent],
   templateUrl: './editor.component.html',
   styleUrl: './editor.component.scss'
 })

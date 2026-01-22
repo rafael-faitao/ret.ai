@@ -14,44 +14,7 @@ import { RetailLayout } from 'models';
   styleUrl: './app.component.scss'
 })
 export class App {
-  @ViewChild('editor') editorComponent?: EditorComponent;
-  @ViewChild('importDialog') importDialog?: LayoutImportDialogComponent;
 
-  protected propertyBarService = new PropertyBarService();
-  protected mockService = inject(MockService);
+
   
-  protected showMenu = signal(false);
-
-  get hasSelection() {
-    return this.propertyBarService.hasSelection();
-  }
-
-  toggleMenu(): void {
-    this.showMenu.update(value => !value);
-  }
-
-  newLayout(): void {
-    this.showMenu.set(false);
-    const layout = this.mockService.generateRetailLayout();
-    this.editorComponent?.loadLayout(layout);
-    this.propertyBarService.setActiveLayout(layout);
-  }
-
-  openGenerateDialog(): void {
-    this.showMenu.set(false);
-    this.importDialog?.openDialog();
-  }
-
-  onLayoutGenerated(layout: RetailLayout): void {
-    this.editorComponent?.loadLayout(layout);
-    this.propertyBarService.setActiveLayout(layout);
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.menu-button-container')) {
-      this.showMenu.set(false);
-    }
-  }
 }

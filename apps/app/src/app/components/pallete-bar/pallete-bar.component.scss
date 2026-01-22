@@ -1,0 +1,19 @@
+.pallete-bar {
+  padding: 1rem;
+}
+.pallete-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.pallete-items button {
+  padding: 0.5rem 1rem;
+  background: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.pallete-items button:hover {
+  background: #e0e0e0;
+}

@@ -1,0 +1,27 @@
+.sidebar-switcher {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.switcher-tabs {
+  display: flex;
+  border-bottom: 1px solid #ccc;
+}
+.switcher-tabs button {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-weight: bold;
+  transition: border-color 0.2s;
+}
+.switcher-tabs button.active {
+  border-bottom: 2px solid #007bff;
+  color: #007bff;
+}
+.switcher-content {
+  flex: 1;
+  overflow-y: auto;
+}
