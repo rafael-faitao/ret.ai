@@ -1,0 +1,10 @@
+    <div class="sidebar-switcher">
+      <div class="switcher-tabs">
+        <button (click)="activeTab = 'pallete'" [class.active]="activeTab === 'pallete'">Pallete</button>
+        <button (click)="activeTab = 'property'" [class.active]="activeTab === 'property'">Properties</button>
+      </div>
+      <div class="switcher-content">
+        <app-pallete-bar *ngIf="activeTab === 'pallete'"></app-pallete-bar>
+        <app-property-bar *ngIf="activeTab === 'property'"></app-property-bar>
+      </div>
+    </div>

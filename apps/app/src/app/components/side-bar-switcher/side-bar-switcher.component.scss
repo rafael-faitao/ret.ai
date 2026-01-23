@@ -1,7 +1,13 @@
 .sidebar-switcher {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+position: fixed;
+  left: 0.5rem;
+  top: 6.5rem;
+  width: 290px;
+  height: calc(100vh - 6.5rem - 1rem);
+  overflow-y: auto;
+  box-sizing: border-box;
+  background: white;
+  border: 1px solid #eee;
 }
 .switcher-tabs {
   display: flex;

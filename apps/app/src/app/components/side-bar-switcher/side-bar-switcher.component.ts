@@ -1,24 +1,15 @@
 import { Component, Input } from '@angular/core';
 import { PropertyBarComponent } from '../property-bar/property-bar.component';
 import { PalleteBarComponent } from '../pallete-bar/pallete-bar.component';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 
 @Component({
   selector: 'app-side-bar-switcher',
   standalone: true,
-  imports: [PropertyBarComponent, PalleteBarComponent],
-  template: `
-    <div class="sidebar-switcher">
-      <div class="switcher-tabs">
-        <button (click)="activeTab = 'pallete'" [class.active]="activeTab === 'pallete'">Pallete</button>
-        <button (click)="activeTab = 'property'" [class.active]="activeTab === 'property'">Properties</button>
-      </div>
-      <div class="switcher-content">
-        <app-pallete-bar *ngIf="activeTab === 'pallete'"></app-pallete-bar>
-        <app-property-bar *ngIf="activeTab === 'property'"></app-property-bar>
-      </div>
-    </div>
-  `,
+  imports: [PropertyBarComponent, PalleteBarComponent, CommonModule, FormsModule],
+  templateUrl: 'side-bar-switcher.component.html',
   styleUrls: ['./side-bar-switcher.component.scss']
 })
 export class SideBarSwitcherComponent {

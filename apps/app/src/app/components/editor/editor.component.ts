@@ -50,6 +50,7 @@ export class EditorComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    alert('a');
     this.initKonva();
   }
 
